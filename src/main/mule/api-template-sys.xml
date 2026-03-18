@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></mule>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="4f549dfe-162e-48b0-8068-3d3f8601630f" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="api-template-sysFlow" doc:id="f60855fb-244b-403c-8e79-ea6af01f7fa6" >
+		<http:listener doc:name="Listener" doc:id="3e331071-b9a4-467e-8dac-0293353c8c10" config-ref="HTTP_Listener_config" path="/status"/>
+		<ee:transform doc:name="Transform Message" doc:id="f9659ce5-dcaa-4297-84a2-a6509dd3477b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	service: "API-Led Health Check ON",
+	version: "1.0.0",
+	timestamp: now() as String {
+		format: "yyyy-MM-dd'T'HH:mm:ssZ"
+	},
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="19bed737-871d-4fbe-b5b1-fde081d5e217" message="#[payload]"/>
+	</flow>
+</mule>
